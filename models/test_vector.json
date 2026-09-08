@@ -1,0 +1,29 @@
+{
+  "features": [
+    "vertical_mean",
+    "vertical_power_3_8",
+    "ml_mean",
+    "ml_rms",
+    "ap_mean",
+    "magnitude_mean",
+    "harmonic_ratio_ml",
+    "magnitude_rms",
+    "vertical_skew",
+    "step_time_mean"
+  ],
+  "x": [
+    0.9288409424110217,
+    0.04309772037594375,
+    -0.1567641907897094,
+    0.20366053093491396,
+    -0.360220993772042,
+    1.028462134810079,
+    2.913342628064344,
+    1.0668752221988909,
+    1.0863314481668382,
+    0.46380952380952384
+  ],
+  "expected_prob_faller": 0.012521987780928612,
+  "subject_id": "CO-001",
+  "window_index": 0
+}

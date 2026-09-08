@@ -1,0 +1,6 @@
+{
+  "source_bytes": 252405,
+  "estimated_flash_bytes_low": 252405,
+  "estimated_flash_bytes_high": 504810,
+  "note": "rough heuristic from source size only -- verify with the real ESP32-S3 toolchain (idf.py size) before trusting it"
+}

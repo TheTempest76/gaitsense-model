@@ -1,0 +1,12 @@
+[
+  "vertical_mean",
+  "vertical_power_3_8",
+  "ml_mean",
+  "ml_rms",
+  "ap_mean",
+  "magnitude_mean",
+  "harmonic_ratio_ml",
+  "magnitude_rms",
+  "vertical_skew",
+  "step_time_mean"
+]
