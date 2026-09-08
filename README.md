@@ -209,7 +209,7 @@ wear and look at.
 
 ```
 firmware/   ESP-IDF firmware: MPU6050 -> features -> score() -> POST
-web/        FastAPI site: ingest, SQLite, dashboard (steps, history, exercises)
+web/        Next.js site: ingest API, SQLite, dashboard (steps, history, exercises)
 tools/      fixture generator, C/Python conformance checker, device simulator
 ```
 
@@ -253,28 +253,36 @@ Two findings from building it are worth carrying forward:
 
 ### `web/` -- the dashboard
 
+A Next.js App Router app -- ingest API and UI in one process, no separate
+backend. React dashboard, hand-built SVG charts (light/dark, a validated
+data-viz palette), SQLite via `better-sqlite3`.
+
 ```bash
-uv pip install -r web/requirements-web.txt
-export GAITSENSE_TOKEN=some-shared-secret
-uvicorn web.server.app:app --host 0.0.0.0 --port 8000
+cd web
+npm install
+cp .env.example .env.local   # set GAITSENSE_TOKEN to match the firmware
+npm run dev                  # http://localhost:3000
 
 # no hardware? this posts real features and real scores, not mock data
 python tools/simulate_device.py --backfill-days 21 --live
 ```
 
 Steps, walking time, cadence, 30 days of history, the gait-pattern indicator
-and an exercise plan. Inference happens on the device; the server re-scores
-each posted feature vector as a **drift check**, so firmware flashed from a
-stale `model.c` shows up as a warning instead of quietly changing what the
-numbers mean.
+and an exercise plan, all polled every 5 seconds. Inference happens on the
+device only -- the earlier FastAPI version of this site re-scored every
+reading server-side as a drift check against `models/model.json`; this app
+has no Python/XGBoost runtime, so that check does not currently exist here
+(see `web/README.md` for what dropped and the cheapest way to bring it back).
 
-The presentation rules live in `web/server/risk.py` and are enforced
-server-side: every response carrying a probability also carries the model card,
-no band is shown under ~2 minutes of walking, 0.35-0.65 is reported as
+The presentation rules live in `web/lib/risk.ts` and are enforced
+server-side: every response carrying a probability also carries the model
+card, no band is shown under ~2 minutes of walking, 0.35-0.65 is reported as
 "inconclusive" and shaded neutral gray rather than amber, and the exercise
 recommendations key on measured steps and cadence rather than on the model.
 Given a 0.592 AUC on a retrospective label, that framing is the honest one --
-see `web/README.md` if you change it.
+see `web/README.md` if you change it. Note also that `web/lib/model-metrics.json`
+is a static copy of the trained model's numbers, not read live from
+`results/metrics.json` -- re-copy it by hand after a retrain.
 
 ## Reproducibility
 

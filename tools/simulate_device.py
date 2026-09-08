@@ -7,6 +7,8 @@ identical payload shape net.c produces -- including the walking gate, so the
 "not scoreable" path gets exercised too.
 
     # 21 days of history, then stream live windows every 5 s
+    # (defaults to the Next.js dev server at localhost:3000; pass --url to
+    # point elsewhere)
     python tools/simulate_device.py --backfill-days 21 --live
 
     # history only
@@ -143,7 +145,8 @@ def post(session, url, token, payload, verbose=False):
 def main():
     ap_ = argparse.ArgumentParser(description=__doc__,
                                   formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap_.add_argument("--url", default="http://127.0.0.1:8000")
+    ap_.add_argument("--url", default="http://127.0.0.1:3000",
+                     help="base URL of the website (default: the Next.js dev server)")
     ap_.add_argument("--token", default="change-me")
     ap_.add_argument("--device-id", default="gaitsense-sim01")
     ap_.add_argument("--backfill-days", type=int, default=0,

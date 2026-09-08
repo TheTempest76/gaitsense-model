@@ -61,10 +61,10 @@ At minimum set, under **GaitSense**:
 
 - `Wi-Fi → SSID` / `password`
 - `Server → Dashboard base URL` — the LAN IP of the machine running the
-  website, e.g. `http://192.168.1.100:8000`. Not `localhost`: on the ESP32,
+  website, e.g. `http://192.168.1.100:3000`. Not `localhost`: on the ESP32,
   localhost is the ESP32.
-- `Server → Device token` — must equal the `GAITSENSE_TOKEN` environment
-  variable the server runs with, or ingest returns 401.
+- `Server → Device token` — must equal `GAITSENSE_TOKEN` in the website's
+  `.env.local` (see `web/README.md`), or ingest returns 401.
 
 `models/model.c` is compiled **directly out of the repo's `models/`
 directory** (see `main/CMakeLists.txt`), not copied here. Re-running

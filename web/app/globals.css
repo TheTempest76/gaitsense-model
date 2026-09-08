@@ -1,0 +1,150 @@
+@import "tailwindcss";
+
+/*
+ * GaitSense design tokens.
+ *
+ * Palette values are the validated reference instance from the data-viz
+ * skill (categorical slots 1-3, checked with its validator for both light
+ * and dark against these exact surfaces — all checks pass; the light-mode
+ * aqua sits below 3:1 contrast, so every chart also ships a table view as
+ * the required relief).
+ *
+ * Tokens are declared as plain CSS custom properties (not Tailwind's `dark:`
+ * variant) so the same values drive both raw CSS in chart components and
+ * Tailwind utilities via the @theme inline block below — one source of
+ * truth, and dark mode is a value swap, not a different class tree.
+ */
+
+:root {
+  color-scheme: light;
+
+  --surface-1: #fcfcfb;
+  --page: #f9f9f7;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #898781;
+  --gridline: #e1e0d9;
+  --baseline: #c3c2b7;
+  --border: rgba(11, 11, 11, 0.1);
+
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-1-soft: rgba(42, 120, 214, 0.14);
+
+  --status-good: #0ca30c;
+  --status-warning: #fab219;
+  --status-critical: #d03b3b;
+
+  /* The indicator band shading is deliberately neutral gray, not
+   * red/amber/green — a 0.59-AUC retrospective classifier does not warrant
+   * traffic-light semantics. */
+  --band-wash: rgba(137, 135, 129, 0.1);
+  --band-edge: rgba(137, 135, 129, 0.28);
+
+  --radius-card: 14px;
+  --shadow-card: 0 1px 2px rgba(11, 11, 11, 0.04);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --surface-1: #1a1a19;
+    --page: #0d0d0d;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #898781;
+    --gridline: #2c2c2a;
+    --baseline: #383835;
+    --border: rgba(255, 255, 255, 0.1);
+
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --series-1-soft: rgba(57, 135, 229, 0.2);
+
+    --band-wash: rgba(137, 135, 129, 0.14);
+    --band-edge: rgba(137, 135, 129, 0.34);
+
+    --shadow-card: none;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --surface-1: #1a1a19;
+  --page: #0d0d0d;
+  --text-primary: #ffffff;
+  --text-secondary: #c3c2b7;
+  --text-muted: #898781;
+  --gridline: #2c2c2a;
+  --baseline: #383835;
+  --border: rgba(255, 255, 255, 0.1);
+
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-1-soft: rgba(57, 135, 229, 0.2);
+
+  --band-wash: rgba(137, 135, 129, 0.14);
+  --band-edge: rgba(137, 135, 129, 0.34);
+
+  --shadow-card: none;
+}
+
+/* Map the tokens above into Tailwind v4's theme so utilities like
+ * `bg-surface`, `text-ink-secondary`, `border-hairline` resolve through the
+ * same custom properties that flip under the dark selectors — no separate
+ * `dark:` variant needed anywhere in the components. */
+@theme inline {
+  --color-surface: var(--surface-1);
+  --color-page: var(--page);
+  --color-ink: var(--text-primary);
+  --color-ink-secondary: var(--text-secondary);
+  --color-ink-muted: var(--text-muted);
+  --color-hairline: var(--gridline);
+  --color-baseline: var(--baseline);
+  --color-hairline-border: var(--border);
+
+  --color-series-1: var(--series-1);
+  --color-series-2: var(--series-2);
+  --color-series-3: var(--series-3);
+
+  --color-status-good: var(--status-good);
+  --color-status-warning: var(--status-warning);
+  --color-status-critical: var(--status-critical);
+
+  --font-sans: var(--font-inter);
+  --radius-card: var(--radius-card);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--page);
+  color: var(--text-primary);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+::selection {
+  background: var(--series-1-soft);
+}
+
+/* Utility used by chart tooltips / tabular figures. */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Scrollable regions (wide charts, tables) never widen the page itself. */
+.no-x-overflow {
+  overflow-x: auto;
+}

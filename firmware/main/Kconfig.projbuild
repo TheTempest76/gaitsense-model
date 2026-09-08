@@ -31,7 +31,7 @@ menu "GaitSense"
 
         config GAITSENSE_SERVER_URL
             string "Dashboard base URL"
-            default "http://192.168.1.100:8000"
+            default "http://192.168.1.100:3000"
             help
                 Base URL of the GaitSense website, with no trailing slash.
                 The firmware POSTs to <this>/api/ingest.

@@ -7,13 +7,16 @@ before any hardware is involved.
 
 ## 0. Prerequisites
 
+- **Node.js 18.18+** and npm — for the website (Next.js 16). Check with
+  `node --version`.
 - **Python 3.11+** with the project venv. From the repo root:
   ```bash
   uv venv
   uv pip install -r requirements.txt
   ```
   (or `python -m venv .venv` + `pip install -r requirements.txt` if you don't
-  use `uv`)
+  use `uv`) — needed for the device simulator and for retraining/re-exporting
+  the model, not for running the website itself.
 - **Docker Desktop** — only needed if you touch `firmware/main/gait_features.c`
   and want to re-run the C/Python conformance check. Not needed to run the
   website or flash firmware.
@@ -24,24 +27,33 @@ before any hardware is involved.
 ## 1. Website
 
 ```bash
-uv pip install -r web/requirements-web.txt
+cd web
+npm install
 
-# must match GAITSENSE_DEVICE_TOKEN you'll set in the firmware later
-export GAITSENSE_TOKEN=some-shared-secret        # PowerShell: $env:GAITSENSE_TOKEN="some-shared-secret"
+cp .env.example .env.local
+# edit .env.local: set GAITSENSE_TOKEN to a secret you'll reuse in the
+# firmware's menuconfig later
 
-uvicorn web.server.app:app --host 0.0.0.0 --port 8000
+npm run dev
 ```
 
-Open <http://localhost:8000>.
+Open <http://localhost:3000>.
 
-- Bind to `0.0.0.0`, not `127.0.0.1` — the ESP32 needs to reach this over the
-  LAN. Allow port 8000 through the host firewall if the device can't connect.
-- The database is created at `web/gaitsense.db` on first run (override the
-  path with `GAITSENSE_DB`). It's gitignored — nothing to clean up.
+- The dev server listens on all interfaces by default, so the ESP32 can reach
+  it at this machine's LAN IP. Allow port 3000 through the host firewall if
+  the device can't connect. For a permanent setup, `npm run build && npm
+  start` runs the production server instead of the dev server.
+- The database is created at `web/gaitsense.db` on first request (override
+  the path with `DATABASE_PATH` in `.env.local`). It's gitignored — nothing
+  to clean up.
+- `better-sqlite3` is a native module built during `npm install`. If that
+  step fails, you're most likely missing a C++ build toolchain — see
+  [node-gyp's platform setup](https://github.com/nodejs/node-gyp#installation).
 
 ### Try it without hardware
 
 ```bash
+# from the repo root, with the Python venv active
 python tools/simulate_device.py --backfill-days 21 --live
 ```
 
@@ -120,7 +132,7 @@ Under **GaitSense**, set at minimum:
 | Setting | Value |
 |---|---|
 | Wi-Fi → SSID / password | your network |
-| Server → Dashboard base URL | `http://<LAN IP of the machine running the website>:8000` — **not** `localhost` |
+| Server → Dashboard base URL | `http://<LAN IP of the machine running the website>:3000` — **not** `localhost` |
 | Server → Device token | must equal `GAITSENSE_TOKEN` from §1, or ingest returns 401 |
 | Sensor orientation → Vertical / ML / AP axis | leave at defaults first; the firmware logs at-rest axis means at boot so you can check and correct them |
 
@@ -182,7 +194,7 @@ do not flash until it passes.
 
 | Symptom | Likely cause |
 |---|---|
-| Device never appears on the dashboard | Wrong `GAITSENSE_SERVER_URL` (must be LAN IP, not `localhost`), firewall blocking port 8000, or Wi-Fi credentials wrong — check the firmware's serial monitor log |
+| Device never appears on the dashboard | Wrong `GAITSENSE_SERVER_URL` (must be LAN IP, not `localhost`), firewall blocking port 3000, or Wi-Fi credentials wrong — check the firmware's serial monitor log |
 | Ingest returns 401 | `GAITSENSE_DEVICE_TOKEN` (firmware) and `GAITSENSE_TOKEN` (server env) don't match |
 | Dashboard shows a "Model mismatch" banner | Firmware was flashed from an older `models/model.c` than the server's current `models/model.json` — rebuild and reflash after any retrain |
 | Every window reports "not scored" | Check the boot-time axis mean log — if the vertical channel isn't ~+1 g, the walking gate and features are being computed on the wrong axis |

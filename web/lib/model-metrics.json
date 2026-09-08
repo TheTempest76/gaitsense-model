@@ -1,0 +1,19 @@
+{
+  "_source": "Copied from results/metrics.json (deployed_model.loso_subject_level) and models/feature_list.json at the repo root, on 2026-09-08. This app has no Python/XGBoost runtime, so these numbers are a static snapshot rather than read live -- if you retrain, re-copy them by hand (or wire up a small export step) or the dashboard will describe a model that no longer matches models/model.c.",
+  "subject_auc_roc": 0.5921052631578947,
+  "subject_sensitivity": 0.5333333333333333,
+  "subject_specificity": 0.6052631578947368,
+  "subject_n": 68,
+  "features": [
+    "vertical_mean",
+    "vertical_power_3_8",
+    "ml_mean",
+    "ml_rms",
+    "ap_mean",
+    "magnitude_mean",
+    "harmonic_ratio_ml",
+    "magnitude_rms",
+    "vertical_skew",
+    "step_time_mean"
+  ]
+}
