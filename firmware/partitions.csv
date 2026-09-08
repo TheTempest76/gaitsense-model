@@ -1,0 +1,6 @@
+# The generated model pushes the app well past the 1 MB default factory app
+# size, so this table gives it 2 MB. Requires a 4 MB flash part or larger.
+# Name,   Type, SubType, Offset,   Size,  Flags
+nvs,      data, nvs,     0x9000,   0x6000,
+phy_init, data, phy,     0xf000,   0x1000,
+factory,  app,  factory, 0x10000,  2M,

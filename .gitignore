@@ -3,3 +3,16 @@ data/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+
+# website runtime database (regenerate with tools/simulate_device.py)
+web/*.db
+web/*.db-wal
+web/*.db-shm
+
+# local screenshots from verification runs
+.screenshots/
+
+# generated conformance fixture -- deterministic, rebuild with:
+#   python tools/gen_conformance_case.py
+firmware/test/cases.txt
+firmware/test/expected.json

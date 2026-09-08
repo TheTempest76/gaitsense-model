@@ -1,0 +1,5 @@
+# Website dependencies, on top of the project's requirements.txt (which already
+# pins xgboost 2.1.1 and numpy, used for the server-side drift check).
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+pydantic==2.9.2

@@ -1,0 +1,22 @@
+# 1 kHz tick: the sample clock is driven by esp_timer, but a finer tick keeps
+# the analysis and upload tasks responsive between windows.
+CONFIG_FREERTOS_HZ=1000
+
+# gait_extract() keeps ~30 KB of static double scratch and the analysis task
+# does software double-precision maths; the default 3.5 KB main stack is not
+# where that should live, hence the dedicated tasks in main.c.
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=6144
+
+# model.c alone is ~250 KB of source. Give the app a partition that can hold it
+# together with the Wi-Fi and HTTP stacks (see partitions.csv).
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+
+# Compiler optimised for size, for the same reason.
+CONFIG_COMPILER_OPTIMIZATION_SIZE=y
+
+# esp_timer dispatches the 100 Hz sample tick from an ISR.
+CONFIG_ESP_TIMER_SUPPORTS_ISR_DISPATCH_METHOD=y
+
+CONFIG_ESP_TASK_WDT_EN=y
+CONFIG_ESP_TASK_WDT_TIMEOUT_S=10

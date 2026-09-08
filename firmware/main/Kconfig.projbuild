@@ -1,0 +1,92 @@
+menu "GaitSense"
+
+    config GAITSENSE_FW_VERSION
+        string "Firmware version string"
+        default "1.0.0"
+        help
+            Reported to the server with every reading and shown on the
+            dashboard's device panel.
+
+    menu "Wi-Fi"
+
+        config GAITSENSE_WIFI_SSID
+            string "Wi-Fi SSID"
+            default "my-network"
+
+        config GAITSENSE_WIFI_PASSWORD
+            string "Wi-Fi password"
+            default ""
+
+        config GAITSENSE_SNTP_SERVER
+            string "SNTP server"
+            default "pool.ntp.org"
+            help
+                Readings are timestamped on the device so that anything
+                buffered while the server is unreachable still lands at the
+                right point in history.
+
+    endmenu
+
+    menu "Server"
+
+        config GAITSENSE_SERVER_URL
+            string "Dashboard base URL"
+            default "http://192.168.1.100:8000"
+            help
+                Base URL of the GaitSense website, with no trailing slash.
+                The firmware POSTs to <this>/api/ingest.
+
+                Use the machine's LAN IP, not localhost -- localhost on the
+                ESP32 means the ESP32.
+
+        config GAITSENSE_DEVICE_TOKEN
+            string "Device token"
+            default "change-me"
+            help
+                Sent as the X-Device-Token header. Must match GAITSENSE_TOKEN
+                in the server's environment, otherwise ingest returns 401.
+
+    endmenu
+
+    menu "MPU6050 wiring"
+
+        config GAITSENSE_I2C_SDA_GPIO
+            int "I2C SDA GPIO"
+            default 21
+
+        config GAITSENSE_I2C_SCL_GPIO
+            int "I2C SCL GPIO"
+            default 22
+
+    endmenu
+
+    menu "Sensor orientation"
+
+        comment "0=+X 1=-X 2=+Y 3=-Y 4=+Z 5=-Z"
+
+        config GAITSENSE_AXIS_V
+            int "Vertical axis (must read about +1 g at rest)"
+            range 0 5
+            default 4
+            help
+                Which raw accelerometer axis corresponds to the training
+                data's vertical channel. The default (+Z) is correct for a
+                board lying flat, component side up.
+
+                The firmware logs the at-rest mean of every axis at boot and
+                warns if the axis you picked is not the one holding gravity.
+                Check that line before trusting any score.
+
+        config GAITSENSE_AXIS_ML
+            int "Mediolateral axis (left-right)"
+            range 0 5
+            default 0
+
+        config GAITSENSE_AXIS_AP
+            int "Anterior-posterior axis (front-back)"
+            range 0 5
+            default 2
+
+    endmenu
+
+endmenu

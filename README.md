@@ -202,6 +202,80 @@ fix was needed: XGBoost >=2.0 serializes `base_score` as the string
   Result: `P(faller) C=0.01252196 python=0.01252199 diff=0.00000002` --
   **PASS**, 4,000x tighter than the 1e-4 requirement.
 
+## Deployment: the wearable and the website
+
+Two folders take the exported model off the bench and into something you can
+wear and look at.
+
+```
+firmware/   ESP-IDF firmware: MPU6050 -> features -> score() -> POST
+web/        FastAPI site: ingest, SQLite, dashboard (steps, history, exercises)
+tools/      fixture generator, C/Python conformance checker, device simulator
+```
+
+### `firmware/` -- the ESP32 node
+
+Samples an MPU6050 at 100 Hz, computes the same ten features on-device, scores
+them with `models/model.c` compiled straight out of this repo, and POSTs the
+result every 5 seconds. See `firmware/README.md` for wiring, `menuconfig`
+settings and the axis-mapping check.
+
+`main/gait_features.c` is a hand-written C port of the SciPy pipeline in
+`src/features.py` -- Butterworth `filtfilt`, `find_peaks` with prominence,
+Welch PSD, harmonic ratio. It is verified against the real training-time
+extractor rather than eyeballed:
+
+```bash
+python tools/gen_conformance_case.py
+docker run --rm -v "$(pwd):/w" -w /w gcc:latest bash -c   "gcc -O2 -I firmware/main -I models -o /tmp/t      firmware/main/gait_features.c firmware/test/test_features.c models/model.c -lm    && /tmp/t firmware/test/cases.txt" > /tmp/c_out.json
+python tools/check_conformance.py < /tmp/c_out.json
+```
+
+Eight windows -- normal, brisk, slow-shuffling, asymmetric and noisy gait plus
+three degenerate cases -- match to a worst-case **2.1e-14 relative error**, with
+step counts, NaN placement and the end-to-end `P(faller)` all agreeing
+(worst probability difference 1.2e-07).
+
+Two findings from building it are worth carrying forward:
+
+- **A walking gate is mandatory.** The conformance fixture's `standing_still`
+  case -- gravity plus 0.002 g of noise -- yields 22 detected "steps" and the
+  model scores it **P(faller) = 0.89**. Step detection cannot distinguish
+  walking from stillness on its own, because the peak detector's prominence
+  threshold is relative to the signal's own standard deviation and so scales
+  down with the noise floor. The firmware gates on absolute movement energy.
+- **NaN windows must not be scored.** `src/features.py` emits NaN when a
+  feature cannot be computed, and the Python model handles that via
+  `missing=np.nan`. m2cgen does not reproduce this: `model.c` emits a bare
+  `if (input[i] < threshold)`, and a NaN comparison is always false, so a NaN
+  silently takes the right branch of every split regardless of the learned
+  direction. The firmware refuses to score incomplete windows instead.
+
+### `web/` -- the dashboard
+
+```bash
+uv pip install -r web/requirements-web.txt
+export GAITSENSE_TOKEN=some-shared-secret
+uvicorn web.server.app:app --host 0.0.0.0 --port 8000
+
+# no hardware? this posts real features and real scores, not mock data
+python tools/simulate_device.py --backfill-days 21 --live
+```
+
+Steps, walking time, cadence, 30 days of history, the gait-pattern indicator
+and an exercise plan. Inference happens on the device; the server re-scores
+each posted feature vector as a **drift check**, so firmware flashed from a
+stale `model.c` shows up as a warning instead of quietly changing what the
+numbers mean.
+
+The presentation rules live in `web/server/risk.py` and are enforced
+server-side: every response carrying a probability also carries the model card,
+no band is shown under ~2 minutes of walking, 0.35-0.65 is reported as
+"inconclusive" and shaded neutral gray rather than amber, and the exercise
+recommendations key on measured steps and cadence rather than on the model.
+Given a 0.592 AUC on a retrospective label, that framing is the honest one --
+see `web/README.md` if you change it.
+
 ## Reproducibility
 
 - Python 3.11.9, dependencies pinned in `requirements.txt`, installed via
