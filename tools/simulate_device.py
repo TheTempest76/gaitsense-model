@@ -233,7 +233,7 @@ HIGH_RISK_TARGET_P = 0.82
 HIGH_RISK_MIN_P = 0.68
 
 
-def calibrate_high_risk(rng, model, n_candidates=40, n_windows=12):
+def calibrate_high_risk(rng, model, n_candidates=28, n_windows=10):
     """Search HIGH_RISK_SPACE for the profile whose lower-quartile P(faller)
     against the real booster lands nearest HIGH_RISK_TARGET_P (and above
     HIGH_RISK_MIN_P). Returns (profile, score)."""
@@ -303,9 +303,10 @@ def main():
         high_risk, hr_p = calibrate_high_risk(np.random.default_rng(args.seed + 1), model)
         healthy_p = _median_prob(np.random.default_rng(args.seed + 2), model,
                                  HEALTHY, 1.4, 2.2, 0.18, 0.42)
-        print(f"  healthy profile   -> median P(faller) ~ {healthy_p:.2f}")
-        print(f"  high-risk profile -> median P(faller) ~ {hr_p:.2f}  "
-              f"(on ~{args.faller_share:.0%} of walking)")
+        print(f"  healthy profile   -> median P(faller)         ~ {healthy_p:.2f}")
+        print(f"  high-risk profile -> lower-quartile P(faller)  ~ {hr_p:.2f}  "
+              f"(used on ~{args.faller_share:.0%} of walking; per-window "
+              f"P runs higher)")
 
     steps_total = 0
     now_ms = int(time.time() * 1000)

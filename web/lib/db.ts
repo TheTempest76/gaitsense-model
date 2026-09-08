@@ -267,7 +267,7 @@ export function devices(): DeviceInfo[] {
        GROUP BY device_id
        ORDER BY last_seen_ms DESC`
     )
-    .all() as Omit<DeviceInfo, "fw" | "rssi" | "ts_source" | "online">[];
+    .all() as Omit<DeviceInfo, "fw" | "rssi" | "ts_source" | "online" | "is_sim">[];
 
   const now = Date.now();
   return rows.map((r) => {
@@ -277,12 +277,14 @@ export function devices(): DeviceInfo[] {
       )
       .get(r.device_id) as { fw: string | null; rssi: number | null; ts_source: "device" | "server" } | undefined;
 
+    const fw = extra?.fw ?? null;
     return {
       ...r,
-      fw: extra?.fw ?? null,
+      fw,
       rssi: extra?.rssi ?? null,
       ts_source: extra?.ts_source ?? "server",
       online: now - r.last_seen_ms < 30_000,
+      is_sim: (fw ?? "").toLowerCase().includes("sim"),
     };
   });
 }

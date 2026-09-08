@@ -98,9 +98,20 @@ one tool managing both the simulator and `npm run dev`/`npm start`):
 — or wire up a systemd unit / Windows Scheduled Task with "restart on
 failure" pointed at the same command.
 
+**A hosted always-on worker** (the website is deployed somewhere and you want
+the simulator running next to it, not on your laptop): `tools/simulator-deploy/`
+has a Dockerfile plus ready-made configs for Render, Fly.io and
+`docker compose`. See `tools/simulator-deploy/README.md` — it also covers the
+one deployment constraint that bites here: the site's SQLite store needs a
+persistent disk, so ingest does not work on Vercel/Netlify-style serverless
+hosts.
+
 The simulator generates real features and real model scores from synthetic
 gait — see `tools/simulate_device.py`'s docstring — it is not fabricating
-the numbers shown, only the underlying "person walking" input.
+the numbers shown, only the underlying "person walking" input. By default
+~35 % of days and walking bouts use a gait profile calibrated at start-up to
+score a high `P(faller)`, so the dashboard's higher-risk band is exercised
+too; tune with `--faller-share` or turn it off with `--no-faller`.
 
 ---
 

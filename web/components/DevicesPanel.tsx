@@ -29,6 +29,11 @@ export function DevicesPanel({ devices }: { devices: DeviceInfo[] | null }) {
                 style={{ background: d.online ? "var(--status-good)" : "var(--text-muted)" }}
               />
               <span className="font-semibold">{d.device_id}</span>
+              {d.is_sim && (
+                <span className="rounded border border-hairline-border bg-page px-1.5 py-0.5 text-[11px] text-ink-muted">
+                  simulated
+                </span>
+              )}
               <span className="tabular-nums text-ink-secondary">fw {d.fw || "?"}</span>
               <span className="tabular-nums text-ink-secondary">{fmtInt(d.total_windows)} windows</span>
               <span className="tabular-nums text-ink-secondary">RSSI {d.rssi ?? "—"} dBm</span>

@@ -1,0 +1,33 @@
+# Fly.io: a single always-on machine running the simulator. No ports — it
+# only makes outbound POSTs to GAITSENSE_URL.
+#
+#   cd <repo root>
+#   fly launch --no-deploy --copy-config --name gaitsense-simulator
+#   fly secrets set GAITSENSE_URL=https://your-site.example.com GAITSENSE_TOKEN=your-secret
+#   fly volumes create sim_state --size 1
+#   fly deploy
+#
+# Docs: https://fly.io/docs/reference/configuration/
+app = "gaitsense-simulator"
+primary_region = "iad"
+
+[build]
+  dockerfile = "tools/simulator-deploy/Dockerfile"
+  # fly builds from the repo root, so the Dockerfile's COPY src/ ... resolves.
+
+[env]
+  GAITSENSE_DEVICE_ID = "gaitsense-sim01"
+  BACKFILL_DAYS = "21"
+  FALLER_SHARE = "0.35"
+  STATE_DIR = "/data"
+  # GAITSENSE_URL and GAITSENSE_TOKEN come from `fly secrets set`.
+
+[[mounts]]
+  source = "sim_state"
+  destination = "/data"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
+  # One machine only — two would double-post as the same device id.
+  count = 1

@@ -1,0 +1,26 @@
+# Long-running simulator on any box with Docker (a VPS, a spare machine).
+#
+#   cd tools/simulator-deploy
+#   GAITSENSE_URL=https://your-site.example.com GAITSENSE_TOKEN=your-secret \
+#     docker compose up -d --build
+#
+# Logs:   docker compose logs -f
+# Stop:   docker compose down   (the seeded-history marker survives in the volume)
+services:
+  simulator:
+    build:
+      context: ../..                                  # repo root
+      dockerfile: tools/simulator-deploy/Dockerfile
+    environment:
+      GAITSENSE_URL: ${GAITSENSE_URL:?set GAITSENSE_URL to the deployed site}
+      GAITSENSE_TOKEN: ${GAITSENSE_TOKEN:-change-me}
+      GAITSENSE_DEVICE_ID: ${GAITSENSE_DEVICE_ID:-gaitsense-sim01}
+      BACKFILL_DAYS: ${BACKFILL_DAYS:-21}
+      FALLER_SHARE: ${FALLER_SHARE:-0.35}
+      STATE_DIR: /data
+    volumes:
+      - sim-state:/data
+    restart: unless-stopped
+
+volumes:
+  sim-state:

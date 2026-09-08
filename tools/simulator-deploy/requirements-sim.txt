@@ -1,0 +1,15 @@
+# Minimal runtime for tools/simulate_device.py when it runs detached from the
+# repo (a container / a PaaS worker). Same pins as the repo root
+# requirements.txt, but only what the simulate -> features -> score path
+# actually imports.
+#
+# Deliberately NOT installed: antropy. It only feeds `sample_entropy_vertical`,
+# which is not one of the 10 deployed features (models/feature_list.json), so
+# leaving it out just makes that one unused column NaN -- exactly as the
+# firmware, which also doesn't compute it, already does. Dropping it removes
+# the numba/llvmlite dependency and roughly halves the image.
+numpy==1.26.4
+scipy==1.13.1
+scikit-learn==1.5.1   # xgboost.XGBClassifier / predict_proba need it at runtime
+xgboost==2.1.1
+requests==2.32.3

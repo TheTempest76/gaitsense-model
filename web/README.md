@@ -45,11 +45,18 @@ This posts real synthetic readings (real features, real model scores, real
 walking-gate logic — see the script's docstring) so you can see the dashboard
 fully populated. Stop with Ctrl+C.
 
+This posts a mix of healthy and (by default ~35 % of the time) calibrated
+high-`P(faller)` gait, so every band of the indicator gets exercised. Tune
+with `--faller-share`, or `--no-faller` for all-healthy.
+
 For a demo or deployment that needs to keep showing live-looking data for
 hours or days with no real hardware attached, run it under
 `tools/run_simulator_loop.ps1` (Windows) or `tools/run_simulator_loop.sh`
 (macOS/Linux/WSL) instead — see `setups.md`'s "Keeping data flowing during a
-demo" section.
+demo" section. To run it as a hosted worker next to a deployed site (Docker /
+Render / Fly), see `tools/simulator-deploy/`. A simulated feed is labelled as
+such on the dashboard (the header and the Devices panel) via the device's
+`-sim` firmware string.
 
 ## API
 

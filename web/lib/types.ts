@@ -68,6 +68,9 @@ export interface DeviceInfo {
   rssi: number | null;
   ts_source: "device" | "server";
   online: boolean;
+  /** True when the readings come from tools/simulate_device.py rather than
+   * real hardware — detected from the firmware string (e.g. "1.0.0-sim"). */
+  is_sim: boolean;
 }
 
 export type AssessmentBand =

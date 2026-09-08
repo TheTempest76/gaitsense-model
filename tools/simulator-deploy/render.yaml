@@ -1,0 +1,30 @@
+# Render.com blueprint: one always-on background worker running the device
+# simulator. In the Render dashboard: New > Blueprint, point it at this repo,
+# then fill in GAITSENSE_URL and GAITSENSE_TOKEN when prompted.
+#
+# Docs: https://render.com/docs/blueprint-spec
+services:
+  - type: worker
+    name: gaitsense-simulator
+    runtime: docker
+    dockerfilePath: ./tools/simulator-deploy/Dockerfile
+    dockerContext: .
+    plan: starter
+    autoDeploy: false
+    envVars:
+      - key: GAITSENSE_URL
+        sync: false          # set in the dashboard: https://<your-site>
+      - key: GAITSENSE_TOKEN
+        sync: false          # must match the website's GAITSENSE_TOKEN
+      - key: GAITSENSE_DEVICE_ID
+        value: gaitsense-sim01
+      - key: BACKFILL_DAYS
+        value: "21"
+      - key: FALLER_SHARE
+        value: "0.35"
+      - key: STATE_DIR
+        value: /data
+    disk:
+      name: sim-state
+      mountPath: /data       # keeps the "already seeded" marker across restarts
+      sizeGB: 1
