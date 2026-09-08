@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { SiteNav } from "@/components/nav/SiteNav";
 import "./globals.css";
 
 const inter = Inter({
@@ -9,8 +10,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "GaitSense",
-  description: "Gait monitoring dashboard for the ESP32 GaitSense wearable.",
+  title: { default: "GaitSense", template: "%s" },
+  description:
+    "GaitSense reads how you walk from an ankle-worn sensor and turns it into a clear Mobility Score, trends over time, and exercises to help you stay steady.",
 };
 
 // Applies a saved theme choice before first paint, so switching themes does
@@ -34,7 +36,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
       </head>
-      <body className="min-h-full font-sans antialiased bg-page text-ink">{children}</body>
+      <body className="min-h-full font-sans antialiased bg-page text-ink">
+        <SiteNav />
+        {/* pb clears the fixed mobile tab bar (~64px + safe-area); sm+ drops it since that bar is mobile-only */}
+        <div className="pb-20 sm:pb-0">{children}</div>
+      </body>
     </html>
   );
 }

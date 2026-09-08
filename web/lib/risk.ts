@@ -72,6 +72,22 @@ export function modelCard(): ModelCard {
     trustworthy_instead:
       "The step count, cadence and walking-time figures on this page are " +
       "direct measurements and do not depend on the model.",
+    // True, and worth stating, but a narrower claim than "the model gets
+    // better with use": the model itself is a fixed booster baked into
+    // models/model.c at export time -- it does not retrain, learn, or
+    // personalise from anything this device sends. What genuinely improves
+    // is the *indicator's* stability: it is a median over the scored
+    // windows in the selected period (see MIN_SCORED_WINDOWS below), so a
+    // handful of odd strides move it less once there are hundreds of
+    // windows behind it than when there are just enough to clear the gate.
+    // Don't strengthen this into an accuracy claim.
+    gets_more_reliable_with_use:
+      "The indicator itself becomes steadier with more recorded walking -- " +
+      "it's a median across every scored window in the period, so a few " +
+      "unusual strides move it far less once weeks of data sit behind it " +
+      "than they did on day one. That's a statement about noise, though, " +
+      "not accuracy: the model doing the scoring is fixed and does not " +
+      "learn from your data.",
   };
 }
 
@@ -99,8 +115,7 @@ function band(prob: number | null, nScored: number): Band {
       label: "Closer to the non-faller pattern",
       detail:
         "This walking pattern sits nearer the group who did not report " +
-        "repeated falls. Given the model's accuracy, treat this as weak " +
-        "evidence at best.",
+        "repeated falls.",
     };
   }
 

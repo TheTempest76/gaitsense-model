@@ -45,6 +45,12 @@ This posts real synthetic readings (real features, real model scores, real
 walking-gate logic — see the script's docstring) so you can see the dashboard
 fully populated. Stop with Ctrl+C.
 
+For a demo or deployment that needs to keep showing live-looking data for
+hours or days with no real hardware attached, run it under
+`tools/run_simulator_loop.ps1` (Windows) or `tools/run_simulator_loop.sh`
+(macOS/Linux/WSL) instead — see `setups.md`'s "Keeping data flowing during a
+demo" section.
+
 ## API
 
 | Endpoint | Purpose |

@@ -16,3 +16,6 @@ web/*.db-shm
 #   python tools/gen_conformance_case.py
 firmware/test/cases.txt
 firmware/test/expected.json
+
+# log from tools/run_simulator_loop.{ps1,sh}
+tools/simulator.log

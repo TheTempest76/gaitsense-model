@@ -64,6 +64,44 @@ affect anything the firmware would send later.
 
 To start clean again, just delete `web/gaitsense.db*` and restart the server.
 
+### Keeping data flowing during a demo (no hardware attached)
+
+If you're deploying or demoing the site over hours or days without a real
+ESP32 attached, `simulate_device.py --live` needs to keep running the whole
+time — the dashboard only shows something "live" while it's actively
+posting. Options, from simplest to most durable:
+
+**Just leave a terminal open** (fine for a few hours):
+```bash
+python tools/simulate_device.py --backfill-days 21 --live
+```
+
+**Auto-restart if it ever exits** (fine for a multi-day demo on your own
+machine — this is a polling loop, not a real process supervisor):
+```powershell
+# Windows PowerShell
+.\tools\run_simulator_loop.ps1
+```
+```bash
+# macOS / Linux / WSL / Git Bash
+./tools/run_simulator_loop.sh
+# to survive closing the terminal: nohup ./tools/run_simulator_loop.sh > /dev/null 2>&1 &
+```
+Both accept `-Url`/`URL`, `-Token`/`TOKEN` if you changed
+`GAITSENSE_TOKEN` from the default, and log everything to
+`tools/simulator.log` (gitignored).
+
+**A real process manager** (if this needs to survive a reboot, or you want
+one tool managing both the simulator and `npm run dev`/`npm start`):
+[pm2](https://pm2.keymetrics.io/) works for both —
+`pm2 start tools/simulate_device.py --interpreter .venv/Scripts/python.exe -- --live`
+— or wire up a systemd unit / Windows Scheduled Task with "restart on
+failure" pointed at the same command.
+
+The simulator generates real features and real model scores from synthetic
+gait — see `tools/simulate_device.py`'s docstring — it is not fabricating
+the numbers shown, only the underlying "person walking" input.
+
 ---
 
 ## 2. Retraining or re-exporting the model (optional)

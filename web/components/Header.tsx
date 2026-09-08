@@ -2,10 +2,12 @@
 
 import { motion } from "framer-motion";
 import { Pill } from "./ui/Pill";
-import { ThemeToggle } from "./ui/ThemeToggle";
 import { fmtAgo } from "@/lib/chart-utils";
 import type { DeviceInfo } from "@/lib/types";
 
+// Branding and the theme toggle live in the shared SiteNav now (rendered
+// once in the root layout); this header is page-specific content only —
+// title plus live device status — so it doesn't duplicate either.
 export function Header({ devices }: { devices: DeviceInfo[] | null }) {
   const primary = devices?.find((d) => d.online) ?? devices?.[0] ?? null;
 
@@ -17,21 +19,18 @@ export function Header({ devices }: { devices: DeviceInfo[] | null }) {
       className="mb-2 flex flex-wrap items-center justify-between gap-3"
     >
       <div>
-        <h1 className="text-xl font-semibold tracking-tight">GaitSense</h1>
+        <h1 className="text-xl font-semibold tracking-tight">Your gait data</h1>
         <p className="mt-0.5 text-[13px] text-ink-secondary">
-          Gait monitoring from the ESP32 lower-back node
+          Live readings from your ESP32 lower-back node
         </p>
       </div>
-      <div className="flex items-center gap-2">
-        <Pill tone={primary ? (primary.online ? "good" : "offline") : "neutral"}>
-          {primary
-            ? primary.online
-              ? `${primary.device_id} · online`
-              : `${primary.device_id} · last seen ${fmtAgo(primary.last_seen_ms)}`
-            : "No device yet"}
-        </Pill>
-        <ThemeToggle />
-      </div>
+      <Pill tone={primary ? (primary.online ? "good" : "offline") : "neutral"}>
+        {primary
+          ? primary.online
+            ? `${primary.device_id} · online`
+            : `${primary.device_id} · last seen ${fmtAgo(primary.last_seen_ms)}`
+          : "No device yet"}
+      </Pill>
     </motion.header>
   );
 }

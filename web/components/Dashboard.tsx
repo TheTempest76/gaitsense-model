@@ -6,9 +6,11 @@ import { fmt, fmtInt } from "@/lib/chart-utils";
 import type { ExercisesResponse, HistoryResponse, RecentReading, SummaryResponse } from "@/lib/types";
 import { Header } from "./Header";
 import { StatTile } from "./StatTile";
-import { AssessmentCard } from "./AssessmentCard";
+import { FallRiskGauge } from "./FallRiskGauge";
+import { CaregiverAlertCard } from "./CaregiverAlertCard";
 import { StepsChart } from "./charts/StepsChart";
 import { RiskChart } from "./charts/RiskChart";
+import { FallHistoryChart } from "./charts/FallHistoryChart";
 import { CadenceChart } from "./charts/CadenceChart";
 import { ExercisesSection } from "./ExercisesSection";
 import { DevicesPanel } from "./DevicesPanel";
@@ -69,7 +71,11 @@ export function Dashboard() {
       </section>
 
       <div className="mt-4">
-        <AssessmentCard assessment={summary?.assessment ?? null} />
+        <FallRiskGauge assessment={summary?.assessment ?? null} />
+      </div>
+
+      <div className="mt-4">
+        <CaregiverAlertCard />
       </div>
 
       <div className="mt-4">
@@ -82,6 +88,10 @@ export function Dashboard() {
           bandLow={history?.bands.low ?? 0.35}
           bandHigh={history?.bands.high ?? 0.65}
         />
+      </div>
+
+      <div className="mt-4">
+        <FallHistoryChart />
       </div>
 
       <div className="mt-4">

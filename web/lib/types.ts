@@ -91,6 +91,7 @@ export interface ModelCard {
   known_confound: string;
   not_medical_advice: string;
   trustworthy_instead: string;
+  gets_more_reliable_with_use: string;
 }
 
 export interface Assessment {
